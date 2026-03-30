@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS course;
+DROP TABLE IF EXISTS track;
+
 CREATE TABLE track (
     track_id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,

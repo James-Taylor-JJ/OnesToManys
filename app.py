@@ -147,3 +147,35 @@ def delete_track(track_id: int):
     conn.close()
 
     return {"message": f"Track {track_id} deleted successfully"}
+
+class CourseCreate(BaseModel):
+    track_id: int
+    title: str
+    description: str
+    topics: str
+
+
+@app.post("/courses")
+def create_course(course: CourseCreate):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (course.track_id,))
+    track = cursor.fetchone()
+
+    if track is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    cursor.execute(
+        "INSERT INTO course (track_id, title, description, topics) VALUES (?, ?, ?, ?)",
+        (course.track_id, course.title, course.description, course.topics)
+    )
+    conn.commit()
+
+    new_id = cursor.lastrowid
+    cursor.execute("SELECT * FROM course WHERE course_id = ?", (new_id,))
+    new_course = cursor.fetchone()
+    conn.close()
+
+    return dict(new_course)

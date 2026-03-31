@@ -99,3 +99,32 @@ def create_track(track: TrackCreate):
     conn.close()
 
     return dict(new_track)
+
+class TrackUpdate(BaseModel):
+    name: str
+    description: str
+
+
+@app.put("/tracks/{track_id}")
+def update_track(track_id: int, track: TrackUpdate):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (track_id,))
+    existing_track = cursor.fetchone()
+
+    if existing_track is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    cursor.execute(
+        "UPDATE track SET name = ?, description = ? WHERE track_id = ?",
+        (track.name, track.description, track_id)
+    )
+    conn.commit()
+
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (track_id,))
+    updated_track = cursor.fetchone()
+    conn.close()
+
+    return dict(updated_track)

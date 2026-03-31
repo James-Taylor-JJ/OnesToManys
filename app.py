@@ -261,3 +261,45 @@ def get_course_for_track(track_id: int, course_id: int):
         raise HTTPException(status_code=404, detail="Course not found for this track")
 
     return dict(course)
+
+class CourseUpdateForTrack(BaseModel):
+    title: str
+    description: str
+    topics: str
+
+@app.put("/tracks/{track_id}/courses/{course_id}")
+def update_course_for_track(track_id: int, course_id: int, course: CourseUpdateForTrack):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (track_id,))
+    track = cursor.fetchone()
+
+    if track is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    cursor.execute(
+        "SELECT * FROM course WHERE course_id = ? AND track_id = ?",
+        (course_id, track_id)
+    )
+    existing_course = cursor.fetchone()
+
+    if existing_course is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Course not found for this track")
+
+    cursor.execute(
+        "UPDATE course SET title = ?, description = ?, topics = ? WHERE course_id = ? AND track_id = ?",
+        (course.title, course.description, course.topics, course_id, track_id)
+    )
+    conn.commit()
+
+    cursor.execute(
+        "SELECT * FROM course WHERE course_id = ? AND track_id = ?",
+        (course_id, track_id)
+    )
+    updated_course = cursor.fetchone()
+    conn.close()
+
+    return dict(updated_course)

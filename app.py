@@ -217,3 +217,21 @@ def update_course(course_id: int, course: CourseUpdate):
     conn.close()
 
     return dict(updated_course)
+
+@app.delete("/courses/{course_id}")
+def delete_course(course_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM course WHERE course_id = ?", (course_id,))
+    existing_course = cursor.fetchone()
+
+    if existing_course is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    cursor.execute("DELETE FROM course WHERE course_id = ?", (course_id,))
+    conn.commit()
+    conn.close()
+
+    return {"message": f"Course {course_id} deleted successfully"}

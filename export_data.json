@@ -1,0 +1,98 @@
+{
+  "tracks": [
+    {
+      "track_id": 1,
+      "name": "Creative Development",
+      "description": "Refined artistic growth and live performance training"
+    },
+    {
+      "track_id": 2,
+      "name": "Business & Strategy",
+      "description": "Understanding the music industry, legal frameworks, and career planning"
+    },
+    {
+      "track_id": 3,
+      "name": "Branding & Image",
+      "description": "Building a strong visual identity and audience presence"
+    }
+  ],
+  "courses": [
+    {
+      "course_id": 103,
+      "track_id": 1,
+      "title": "Live Performance & Stage Presence",
+      "description": "Develop confidence and command on stage",
+      "topics": "stage presence, audience engagement, performance flow"
+    },
+    {
+      "course_id": 104,
+      "track_id": 1,
+      "title": "Rehearsal Techniques",
+      "description": "Run efficient and productive rehearsals",
+      "topics": "practice routines, band coordination, time management"
+    },
+    {
+      "course_id": 201,
+      "track_id": 2,
+      "title": "Music Business Fundamentals",
+      "description": "Overview of how the music industry operates",
+      "topics": "industry structure, revenue streams, roles"
+    },
+    {
+      "course_id": 202,
+      "track_id": 2,
+      "title": "Copyright & Royalties",
+      "description": "Understand ownership and how artists get paid",
+      "topics": "copyright law, royalties, publishing"
+    },
+    {
+      "course_id": 203,
+      "track_id": 2,
+      "title": "Contracts & Agreements",
+      "description": "Learn how to read and evaluate music contracts",
+      "topics": "record deals, licensing, negotiation"
+    },
+    {
+      "course_id": 204,
+      "track_id": 2,
+      "title": "Career Roadmapping",
+      "description": "Plan long-term growth and milestones as an artist",
+      "topics": "goal setting, strategy planning, career paths"
+    },
+    {
+      "course_id": 301,
+      "track_id": 3,
+      "title": "Artist Branding Basics",
+      "description": "Define your unique identity and artistic voice",
+      "topics": "brand identity, storytelling, positioning"
+    },
+    {
+      "course_id": 302,
+      "track_id": 3,
+      "title": "Visual Aesthetic & Content Creation",
+      "description": "Create consistent visuals for your brand",
+      "topics": "photoshoots, album art, visual themes"
+    },
+    {
+      "course_id": 303,
+      "track_id": 3,
+      "title": "Social Media Strategy",
+      "description": "Grow and engage your audience online",
+      "topics": "content planning, engagement, platforms"
+    },
+    {
+      "course_id": 304,
+      "track_id": 3,
+      "title": "PR & Playlisting",
+      "description": "Increase exposure through media and playlists",
+      "topics": "press outreach, playlist pitching, networking"
+    },
+    {
+      "course_id": 305,
+      "track_id": 1,
+      "title": "Advanced Stagecraft",
+      "description": "Develop stronger stage movement and live show control",
+      "topics": "movement, stage confidence, transitions"
+    }
+  ]
+}

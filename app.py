@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 import sqlite3
 
 app = FastAPI()
@@ -76,3 +77,25 @@ def get_course(course_id: int):
         raise HTTPException(status_code=404, detail="Course not found")
 
     return dict(row)
+
+class TrackCreate(BaseModel):
+    name: str
+    description: str
+
+
+@app.post("/tracks")
+def create_track(track: TrackCreate):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO track (name, description) VALUES (?, ?)",
+        (track.name, track.description)
+    )
+    conn.commit()
+
+    new_id = cursor.lastrowid
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (new_id,))
+    new_track = cursor.fetchone()
+    conn.close()
+
+    return dict(new_track)

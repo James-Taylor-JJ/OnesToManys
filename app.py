@@ -364,3 +364,45 @@ def export_data_json():
         "tracks_count": len(tracks),
         "courses_count": len(courses)
     }
+
+@app.post("/import/json")
+def import_data_json():
+    import_path = Path("export_data.json")
+
+    if not import_path.exists():
+        raise HTTPException(status_code=404, detail="export_data.json not found")
+
+    data = json.loads(import_path.read_text())
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM course")
+    cursor.execute("DELETE FROM track")
+
+    for track in data.get("tracks", []):
+        cursor.execute(
+            "INSERT INTO track (track_id, name, description) VALUES (?, ?, ?)",
+            (track["track_id"], track["name"], track["description"])
+        )
+
+    for course in data.get("courses", []):
+        cursor.execute(
+            "INSERT INTO course (course_id, track_id, title, description, topics) VALUES (?, ?, ?, ?, ?)",
+            (
+                course["course_id"],
+                course["track_id"],
+                course["title"],
+                course["description"],
+                course["topics"]
+            )
+        )
+
+    conn.commit()
+    conn.close()
+
+    return {
+        "message": "Data imported successfully",
+        "tracks_count": len(data.get("tracks", [])),
+        "courses_count": len(data.get("courses", []))
+    }

@@ -128,3 +128,22 @@ def update_track(track_id: int, track: TrackUpdate):
     conn.close()
 
     return dict(updated_track)
+
+
+@app.delete("/tracks/{track_id}")
+def delete_track(track_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (track_id,))
+    existing_track = cursor.fetchone()
+
+    if existing_track is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    cursor.execute("DELETE FROM track WHERE track_id = ?", (track_id,))
+    conn.commit()
+    conn.close()
+
+    return {"message": f"Track {track_id} deleted successfully"}

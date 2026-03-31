@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import sqlite3
 
 app = FastAPI()
@@ -19,5 +19,60 @@ def get_tracks():
     cursor.execute("SELECT * FROM track")
     rows = cursor.fetchall()
     conn.close()
+    return [dict(row) for row in rows]
+
+
+@app.get("/courses")
+def get_courses():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM course")
+    rows = cursor.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+
+@app.get("/tracks/{track_id}")
+def get_track(track_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (track_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row is None:
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    return dict(row)
+
+
+@app.get("/tracks/{track_id}/courses")
+def get_courses_for_track(track_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (track_id,))
+    track = cursor.fetchone()
+
+    if track is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    cursor.execute("SELECT * FROM course WHERE track_id = ?", (track_id,))
+    rows = cursor.fetchall()
+    conn.close()
 
     return [dict(row) for row in rows]
+
+@app.get("/courses/{course_id}")
+def get_course(course_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM course WHERE course_id = ?", (course_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row is None:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    return dict(row)

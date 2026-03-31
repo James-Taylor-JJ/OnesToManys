@@ -303,3 +303,34 @@ def update_course_for_track(track_id: int, course_id: int, course: CourseUpdateF
     conn.close()
 
     return dict(updated_course)
+
+@app.delete("/tracks/{track_id}/courses/{course_id}")
+def delete_course_for_track(track_id: int, course_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (track_id,))
+    track = cursor.fetchone()
+
+    if track is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    cursor.execute(
+        "SELECT * FROM course WHERE course_id = ? AND track_id = ?",
+        (course_id, track_id)
+    )
+    existing_course = cursor.fetchone()
+
+    if existing_course is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Course not found for this track")
+
+    cursor.execute(
+        "DELETE FROM course WHERE course_id = ? AND track_id = ?",
+        (course_id, track_id)
+    )
+    conn.commit()
+    conn.close()
+
+    return {"message": f"Course {course_id} deleted from track {track_id} successfully"}

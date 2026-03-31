@@ -235,3 +235,29 @@ def delete_course(course_id: int):
     conn.close()
 
     return {"message": f"Course {course_id} deleted successfully"}
+
+@app.get("/tracks/{track_id}/courses/{course_id}")
+def get_course_for_track(track_id: int, course_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # verify parent track exists
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (track_id,))
+    track = cursor.fetchone()
+
+    if track is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    # fetch the specific child under that parent
+    cursor.execute(
+        "SELECT * FROM course WHERE course_id = ? AND track_id = ?",
+        (course_id, track_id)
+    )
+    course = cursor.fetchone()
+    conn.close()
+
+    if course is None:
+        raise HTTPException(status_code=404, detail="Course not found for this track")
+
+    return dict(course)

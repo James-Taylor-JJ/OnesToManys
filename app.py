@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import sqlite3
+import json
+from pathlib import Path
 
 app = FastAPI()
 
@@ -334,3 +336,31 @@ def delete_course_for_track(track_id: int, course_id: int):
     conn.close()
 
     return {"message": f"Course {course_id} deleted from track {track_id} successfully"}
+
+@app.get("/export/json")
+def export_data_json():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM track")
+    tracks = [dict(row) for row in cursor.fetchall()]
+
+    cursor.execute("SELECT * FROM course")
+    courses = [dict(row) for row in cursor.fetchall()]
+
+    conn.close()
+
+    data = {
+        "tracks": tracks,
+        "courses": courses
+    }
+
+    export_path = Path("export_data.json")
+    export_path.write_text(json.dumps(data, indent=2))
+
+    return {
+        "message": "Data exported successfully",
+        "file": str(export_path),
+        "tracks_count": len(tracks),
+        "courses_count": len(courses)
+    }

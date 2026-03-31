@@ -179,3 +179,41 @@ def create_course(course: CourseCreate):
     conn.close()
 
     return dict(new_course)
+
+class CourseUpdate(BaseModel):
+    track_id: int
+    title: str
+    description: str
+    topics: str
+
+
+@app.put("/courses/{course_id}")
+def update_course(course_id: int, course: CourseUpdate):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM course WHERE course_id = ?", (course_id,))
+    existing_course = cursor.fetchone()
+
+    if existing_course is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    cursor.execute("SELECT * FROM track WHERE track_id = ?", (course.track_id,))
+    track = cursor.fetchone()
+
+    if track is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    cursor.execute(
+        "UPDATE course SET track_id = ?, title = ?, description = ?, topics = ? WHERE course_id = ?",
+        (course.track_id, course.title, course.description, course.topics, course_id)
+    )
+    conn.commit()
+
+    cursor.execute("SELECT * FROM course WHERE course_id = ?", (course_id,))
+    updated_course = cursor.fetchone()
+    conn.close()
+
+    return dict(updated_course)

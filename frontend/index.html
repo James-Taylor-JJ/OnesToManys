@@ -4,6 +4,7 @@
     <title>Music Tracks App</title>
 </head>
 <body>
+
     <h1>Tracks</h1>
     <p>Click a track to load its courses.</p>
 
@@ -15,9 +16,19 @@
     <h2>Track List</h2>
     <ul id="track-list"></ul>
 
+    <h2>Selected Track</h2>
+    <p id="selected-track">No track selected.</p>
+
+    <h2>Create Course</h2>
+    <input id="course-title" placeholder="Course title">
+    <input id="course-description" placeholder="Course description">
+    <input id="course-topics" placeholder="Topics">
+    <button onclick="createCourse()">Add Course</button>
+
     <h2>Courses</h2>
     <ul id="course-list"></ul>
 
     <script src="script.js"></script>
+
 </body>
 </html>

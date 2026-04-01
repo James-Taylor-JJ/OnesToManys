@@ -1,38 +1,83 @@
 const API_URL = "http://127.0.0.1:8000";
 
-// load tracks when page loads
+console.log("Script is running");
+
 async function loadTracks() {
-    const response = await fetch(`${API_URL}/tracks`);
-    const tracks = await response.json();
+    try {
+        console.log("Loading tracks...");
 
-    const trackList = document.getElementById("track-list");
-    trackList.innerHTML = "";
+        const response = await fetch(`${API_URL}/tracks`);
+        console.log("Track response status:", response.status);
 
-    tracks.forEach(track => {
+        const tracks = await response.json();
+        console.log("Tracks received:", tracks);
+
+        const trackList = document.getElementById("track-list");
+        trackList.innerHTML = "";
+
+        if (!Array.isArray(tracks) || tracks.length === 0) {
+            const li = document.createElement("li");
+            li.textContent = "No tracks found.";
+            trackList.appendChild(li);
+            return;
+        }
+
+        tracks.forEach(track => {
+            const li = document.createElement("li");
+            li.textContent = `${track.track_id}: ${track.name}`;
+            li.style.cursor = "pointer";
+
+            li.addEventListener("click", () => loadCourses(track.track_id));
+
+            trackList.appendChild(li);
+        });
+    } catch (error) {
+        console.error("Error loading tracks:", error);
+
+        const trackList = document.getElementById("track-list");
+        trackList.innerHTML = "";
+
         const li = document.createElement("li");
-        li.textContent = track.name;
-
-        // click → load courses
-        li.onclick = () => loadCourses(track.track_id);
-
+        li.textContent = "Failed to load tracks.";
         trackList.appendChild(li);
-    });
+    }
 }
 
-// load courses for a track
 async function loadCourses(trackId) {
-    const response = await fetch(`${API_URL}/tracks/${trackId}/courses`);
-    const courses = await response.json();
+    try {
+        console.log(`Loading courses for track ${trackId}...`);
 
-    const courseList = document.getElementById("course-list");
-    courseList.innerHTML = "";
+        const response = await fetch(`${API_URL}/tracks/${trackId}/courses`);
+        console.log("Course response status:", response.status);
 
-    courses.forEach(course => {
+        const courses = await response.json();
+        console.log("Courses received:", courses);
+
+        const courseList = document.getElementById("course-list");
+        courseList.innerHTML = "";
+
+        if (!Array.isArray(courses) || courses.length === 0) {
+            const li = document.createElement("li");
+            li.textContent = "No courses found for this track.";
+            courseList.appendChild(li);
+            return;
+        }
+
+        courses.forEach(course => {
+            const li = document.createElement("li");
+            li.textContent = `${course.course_id}: ${course.title}`;
+            courseList.appendChild(li);
+        });
+    } catch (error) {
+        console.error("Error loading courses:", error);
+
+        const courseList = document.getElementById("course-list");
+        courseList.innerHTML = "";
+
         const li = document.createElement("li");
-        li.textContent = course.title;
+        li.textContent = "Failed to load courses.";
         courseList.appendChild(li);
-    });
+    }
 }
 
-// run on page load
 loadTracks();

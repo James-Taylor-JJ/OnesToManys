@@ -9,7 +9,7 @@
 
     <h2>Search Track</h2>
     <select id="track-selector" onchange="handleTrackSelection()">
-        <option value="">-- Select a Track --</option>
+        <option value="">-- Search by Track --</option>
     </select>
 
     <h3>Track Information</h3>
@@ -18,8 +18,14 @@
 
     <h2>Search Course</h2>
     <select id="course-selector" onchange="handleCourseSelection()">
-        <option value="">-- Select a Course --</option>
+        <option value="">-- Search by Course --</option>
     </select>
+
+    <h3>Selected Course</h3>
+    <div>
+        <input id="selected-course-field" value="None selected" readonly>
+        <button onclick="deleteSelectedCourse()">Delete</button>
+    </div>
 
     <h3>Course Information</h3>
     <p><strong>Title:</strong> <span id="course-title-display">None selected</span></p>

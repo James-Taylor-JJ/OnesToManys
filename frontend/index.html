@@ -5,28 +5,27 @@
 </head>
 <body>
 
-    <h1>Tracks</h1>
+    <h1>Music Tracks App</h1>
 
     <h2>Select Track</h2>
     <select id="track-selector" onchange="handleTrackSelection()">
         <option value="">-- Select a Track --</option>
     </select>
 
-    <p id="track-description"></p>
+    <h3>Track Information</h3>
+    <p><strong>Name:</strong> <span id="track-name-display">None selected</span></p>
+    <p><strong>Description:</strong> <span id="track-description-display">None selected</span></p>
 
-    <h2>Create Track</h2>
-    <input id="track-name" placeholder="Track name">
-    <input id="track-description-input" placeholder="Description">
-    <button onclick="createTrack()">Add Track</button>
+    <h2>Select Course</h2>
+    <select id="course-selector" onchange="handleCourseSelection()">
+        <option value="">-- Select a Course --</option>
+    </select>
 
-    <h2>Create Course (for selected track)</h2>
-    <input id="course-title" placeholder="Course title">
-    <input id="course-description" placeholder="Course description">
-    <input id="course-topics" placeholder="Topics">
-    <button onclick="createCourse()">Add Course</button>
-
-    <h2>Courses</h2>
-    <ul id="course-list"></ul>
+    <h3>Course Information</h3>
+    <p><strong>Title:</strong> <span id="course-title-display">None selected</span></p>
+    <p><strong>Description:</strong> <span id="course-description-display">None selected</span></p>
+    <p><strong>Topics:</strong> <span id="course-topics-display">None selected</span></p>
+    <p><strong>Parent Track:</strong> <span id="course-track-display">None selected</span></p>
 
     <script src="script.js"></script>
 

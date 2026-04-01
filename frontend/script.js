@@ -1,29 +1,25 @@
 const API_URL = "http://127.0.0.1:8000";
 
 let tracksData = [];
+let coursesData = [];
 let selectedTrackId = null;
-
-console.log("Script is running");
 
 async function loadTracks() {
     try {
         const response = await fetch(`${API_URL}/tracks`);
         const tracks = await response.json();
 
-        console.log("Tracks:", tracks);
-
         tracksData = tracks;
 
-        const selector = document.getElementById("track-selector");
-        selector.innerHTML = '<option value="">-- Select a Track --</option>';
+        const trackSelector = document.getElementById("track-selector");
+        trackSelector.innerHTML = '<option value="">-- Select a Track --</option>';
 
         tracks.forEach(track => {
             const option = document.createElement("option");
             option.value = track.track_id;
             option.textContent = track.name;
-            selector.appendChild(option);
+            trackSelector.appendChild(option);
         });
-
     } catch (error) {
         console.error("Error loading tracks:", error);
     }
@@ -35,104 +31,93 @@ function handleTrackSelection() {
 
     if (!trackId) {
         selectedTrackId = null;
-        document.getElementById("track-description").textContent = "";
-        document.getElementById("course-list").innerHTML = "";
+        coursesData = [];
+
+        document.getElementById("track-name-display").textContent = "None selected";
+        document.getElementById("track-description-display").textContent = "None selected";
+
+        resetCourseSelector();
+        resetCourseDisplay();
         return;
     }
 
     selectedTrackId = parseInt(trackId);
 
-    const track = tracksData.find(t => t.track_id === selectedTrackId);
+    const selectedTrack = tracksData.find(track => track.track_id === selectedTrackId);
 
-    document.getElementById("track-description").textContent =
-        track.description || "No description available.";
+    document.getElementById("track-name-display").textContent = selectedTrack.name;
+    document.getElementById("track-description-display").textContent =
+        selectedTrack.description || "No description available.";
 
-    loadCourses(selectedTrackId);
+    loadCoursesForTrack(selectedTrackId);
 }
 
-async function loadCourses(trackId) {
+async function loadCoursesForTrack(trackId) {
     try {
         const response = await fetch(`${API_URL}/tracks/${trackId}/courses`);
         const courses = await response.json();
 
-        const courseList = document.getElementById("course-list");
-        courseList.innerHTML = "";
+        coursesData = courses;
+
+        const courseSelector = document.getElementById("course-selector");
+        courseSelector.innerHTML = '<option value="">-- Select a Course --</option>';
 
         if (!Array.isArray(courses) || courses.length === 0) {
-            const li = document.createElement("li");
-            li.textContent = "No courses found for this track.";
-            courseList.appendChild(li);
+            resetCourseDisplay();
             return;
         }
 
         courses.forEach(course => {
-            const li = document.createElement("li");
-            li.textContent = `${course.course_id}: ${course.title}`;
-            courseList.appendChild(li);
+            const option = document.createElement("option");
+            option.value = course.course_id;
+            option.textContent = course.title;
+            courseSelector.appendChild(option);
         });
 
+        resetCourseDisplay();
     } catch (error) {
         console.error("Error loading courses:", error);
+        resetCourseSelector();
+        resetCourseDisplay();
     }
 }
 
-async function createTrack() {
-    const name = document.getElementById("track-name").value;
-    const description = document.getElementById("track-description-input").value;
+function handleCourseSelection() {
+    const selector = document.getElementById("course-selector");
+    const courseId = selector.value;
 
-    try {
-        const response = await fetch(`${API_URL}/tracks`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ name, description })
-        });
-
-        const newTrack = await response.json();
-        console.log("Created track:", newTrack);
-
-        document.getElementById("track-name").value = "";
-        document.getElementById("track-description-input").value = "";
-
-        loadTracks();
-
-    } catch (error) {
-        console.error("Error creating track:", error);
-    }
-}
-
-async function createCourse() {
-    if (!selectedTrackId) {
-        alert("Please select a track first.");
+    if (!courseId) {
+        resetCourseDisplay();
         return;
     }
 
-    const title = document.getElementById("course-title").value;
-    const description = document.getElementById("course-description").value;
-    const topics = document.getElementById("course-topics").value;
+    const selectedCourse = coursesData.find(course => course.course_id === parseInt(courseId));
+    const selectedTrack = tracksData.find(track => track.track_id === selectedTrackId);
 
-    try {
-        const response = await fetch(`${API_URL}/tracks/${selectedTrackId}/courses`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ title, description, topics })
-        });
-
-        const newCourse = await response.json();
-        console.log("Created course:", newCourse);
-
-        document.getElementById("course-title").value = "";
-        document.getElementById("course-description").value = "";
-        document.getElementById("course-topics").value = "";
-
-        loadCourses(selectedTrackId);
-
-    } catch (error) {
-        console.error("Error creating course:", error);
+    if (!selectedCourse) {
+        resetCourseDisplay();
+        return;
     }
+
+    document.getElementById("course-title-display").textContent = selectedCourse.title;
+    document.getElementById("course-description-display").textContent =
+        selectedCourse.description || "No description available.";
+    document.getElementById("course-topics-display").textContent =
+        selectedCourse.topics || "No topics available.";
+    document.getElementById("course-track-display").textContent =
+        selectedTrack ? selectedTrack.name : "Unknown track";
+}
+
+function resetCourseSelector() {
+    document.getElementById("course-selector").innerHTML =
+        '<option value="">-- Select a Course --</option>';
+}
+
+function resetCourseDisplay() {
+    document.getElementById("course-title-display").textContent = "None selected";
+    document.getElementById("course-description-display").textContent = "None selected";
+    document.getElementById("course-topics-display").textContent = "None selected";
+    document.getElementById("course-track-display").textContent = "None selected";
 }
 
 loadTracks();

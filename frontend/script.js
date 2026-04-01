@@ -403,3 +403,55 @@ function resetUpdateCourseForm() {
 }
 
 loadTracks();
+
+async function selectCourseById() {
+    const input = document.getElementById("course-id-search").value.trim();
+
+    if (!input) {
+        alert("Please enter a course ID.");
+        return;
+    }
+
+    const courseId = parseInt(input, 10);
+
+    if (Number.isNaN(courseId)) {
+        alert("Course ID must be a number.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/courses/${courseId}`);
+        const course = await response.json();
+
+        if (!response.ok) {
+            alert(course.detail || "Course not found.");
+            return;
+        }
+
+        await syncUiToCourse(course);
+    } catch (error) {
+        console.error("Error selecting course by ID:", error);
+    }
+}
+
+async function syncUiToCourse(course) {
+    const targetTrackId = course.track_id;
+
+    if (!tracksData.some(track => track.track_id === targetTrackId)) {
+        await loadTracks(true);
+    }
+
+    selectedTrackId = targetTrackId;
+
+    const trackSelector = document.getElementById("track-selector");
+    trackSelector.value = String(targetTrackId);
+    handleTrackSelection();
+
+    await loadCoursesForTrack(targetTrackId, true);
+
+    selectedCourseId = course.course_id;
+
+    const courseSelector = document.getElementById("course-selector");
+    courseSelector.value = String(course.course_id);
+    handleCourseSelection();
+}

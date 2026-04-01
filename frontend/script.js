@@ -1,59 +1,59 @@
 const API_URL = "http://127.0.0.1:8000";
 
+let tracksData = [];
 let selectedTrackId = null;
 
 console.log("Script is running");
 
 async function loadTracks() {
     try {
-        console.log("Loading tracks...");
-
         const response = await fetch(`${API_URL}/tracks`);
-        console.log("Track response status:", response.status);
-
         const tracks = await response.json();
-        console.log("Tracks received:", tracks);
 
-        const trackList = document.getElementById("track-list");
-        trackList.innerHTML = "";
+        console.log("Tracks:", tracks);
 
-        if (!Array.isArray(tracks) || tracks.length === 0) {
-            const li = document.createElement("li");
-            li.textContent = "No tracks found.";
-            trackList.appendChild(li);
-            return;
-        }
+        tracksData = tracks;
+
+        const selector = document.getElementById("track-selector");
+        selector.innerHTML = '<option value="">-- Select a Track --</option>';
 
         tracks.forEach(track => {
-            const li = document.createElement("li");
-            li.textContent = `${track.track_id}: ${track.name}`;
-            li.style.cursor = "pointer";
-
-            li.addEventListener("click", () => {
-                selectedTrackId = track.track_id;
-                document.getElementById("selected-track").textContent =
-                    `Track ${track.track_id}: ${track.name}`;
-                loadCourses(track.track_id);
-            });
-
-            trackList.appendChild(li);
+            const option = document.createElement("option");
+            option.value = track.track_id;
+            option.textContent = track.name;
+            selector.appendChild(option);
         });
+
     } catch (error) {
         console.error("Error loading tracks:", error);
-        document.getElementById("track-list").innerHTML =
-            "<li>Failed to load tracks.</li>";
     }
+}
+
+function handleTrackSelection() {
+    const selector = document.getElementById("track-selector");
+    const trackId = selector.value;
+
+    if (!trackId) {
+        selectedTrackId = null;
+        document.getElementById("track-description").textContent = "";
+        document.getElementById("course-list").innerHTML = "";
+        return;
+    }
+
+    selectedTrackId = parseInt(trackId);
+
+    const track = tracksData.find(t => t.track_id === selectedTrackId);
+
+    document.getElementById("track-description").textContent =
+        track.description || "No description available.";
+
+    loadCourses(selectedTrackId);
 }
 
 async function loadCourses(trackId) {
     try {
-        console.log(`Loading courses for track ${trackId}...`);
-
         const response = await fetch(`${API_URL}/tracks/${trackId}/courses`);
-        console.log("Course response status:", response.status);
-
         const courses = await response.json();
-        console.log("Courses received:", courses);
 
         const courseList = document.getElementById("course-list");
         courseList.innerHTML = "";
@@ -70,16 +70,15 @@ async function loadCourses(trackId) {
             li.textContent = `${course.course_id}: ${course.title}`;
             courseList.appendChild(li);
         });
+
     } catch (error) {
         console.error("Error loading courses:", error);
-        document.getElementById("course-list").innerHTML =
-            "<li>Failed to load courses.</li>";
     }
 }
 
 async function createTrack() {
     const name = document.getElementById("track-name").value;
-    const description = document.getElementById("track-description").value;
+    const description = document.getElementById("track-description-input").value;
 
     try {
         const response = await fetch(`${API_URL}/tracks`, {
@@ -87,26 +86,24 @@ async function createTrack() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                name: name,
-                description: description
-            })
+            body: JSON.stringify({ name, description })
         });
 
         const newTrack = await response.json();
         console.log("Created track:", newTrack);
 
         document.getElementById("track-name").value = "";
-        document.getElementById("track-description").value = "";
+        document.getElementById("track-description-input").value = "";
 
         loadTracks();
+
     } catch (error) {
         console.error("Error creating track:", error);
     }
 }
 
 async function createCourse() {
-    if (selectedTrackId === null) {
+    if (!selectedTrackId) {
         alert("Please select a track first.");
         return;
     }
@@ -121,11 +118,7 @@ async function createCourse() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                title: title,
-                description: description,
-                topics: topics
-            })
+            body: JSON.stringify({ title, description, topics })
         });
 
         const newCourse = await response.json();
@@ -136,6 +129,7 @@ async function createCourse() {
         document.getElementById("course-topics").value = "";
 
         loadCourses(selectedTrackId);
+
     } catch (error) {
         console.error("Error creating course:", error);
     }

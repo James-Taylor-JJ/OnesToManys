@@ -16,12 +16,14 @@
 
         .inline-delete {
             display: flex;
-            align-items: center;
+            align-items: end;
             gap: 8px;
         }
 
         .section {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #ccc;
         }
     </style>
 </head>
@@ -30,14 +32,74 @@
     <h1>Music Tracks App</h1>
 
     <div class="section">
-        <h2>Search Track</h2>
+        <h2>Create Track</h2>
+
+        <div>
+            <label>Track ID</label><br>
+            <input id="create-track-id" class="wide-input" placeholder="Track ID">
+        </div>
+
+        <div>
+            <label>Name</label><br>
+            <input id="create-track-name" class="wide-input" placeholder="Track name">
+        </div>
+
+        <div>
+            <label>Description</label><br>
+            <textarea id="create-track-description" class="wide-textarea" placeholder="Track description"></textarea>
+        </div>
+
+        <button onclick="createTrack()">Create Track</button>
+    </div>
+
+    <div class="section">
+        <h3>Search Track</h3>
         <select id="track-selector" onchange="handleTrackSelection()">
             <option value="">-- Search by Track --</option>
         </select>
+    </div>
 
-        <h3>Track Information</h3>
-        <p><strong>Name:</strong> <span id="track-name-display">None selected</span></p>
-        <p><strong>Description:</strong> <span id="track-description-display">None selected</span></p>
+    <div class="section">
+        <h3>Selected Track</h3>
+
+        <div>
+            <label>Track ID</label><br>
+            <input id="selected-track-id" class="wide-input" value="" readonly>
+        </div>
+
+        <div>
+            <label>Name</label><br>
+            <input id="selected-track-name" class="wide-input" value="" readonly>
+        </div>
+
+        <div class="inline-delete">
+            <div>
+                <label>Description</label><br>
+                <textarea id="selected-track-description" class="wide-textarea" readonly></textarea>
+            </div>
+            <button onclick="deleteSelectedTrack()">Delete</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Update Selected Track</h3>
+
+        <div>
+            <label>Track ID</label><br>
+            <input id="update-track-id" class="wide-input" readonly>
+        </div>
+
+        <div>
+            <label>Name</label><br>
+            <input id="update-track-name" class="wide-input" placeholder="Updated track name">
+        </div>
+
+        <div>
+            <label>Description</label><br>
+            <textarea id="update-track-description" class="wide-textarea" placeholder="Updated track description"></textarea>
+        </div>
+
+        <button onclick="updateSelectedTrack()">Update Track</button>
     </div>
 
     <div class="section">
@@ -45,7 +107,7 @@
 
         <div>
             <label>Course ID</label><br>
-            <input id="create-course-id" class="wide-input" value="Auto-generated" readonly>
+            <input id="create-course-id" class="wide-input" placeholder="Course ID">
         </div>
 
         <div>
@@ -142,6 +204,5 @@
     </div>
 
     <script src="script.js"></script>
-
 </body>
 </html>

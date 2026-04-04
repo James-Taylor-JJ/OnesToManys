@@ -14,6 +14,8 @@ app.add_middleware(
     allow_origins=[
         "http://127.0.0.1:5500",
         "http://localhost:5500",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -166,6 +168,7 @@ def delete_track(track_id: int):
 
 class CourseCreate(BaseModel):
     track_id: int
+    course_id: int
     title: str
     description: str
     topics: str
@@ -184,8 +187,8 @@ def create_course(course: CourseCreate):
         raise HTTPException(status_code=404, detail="Track not found")
 
     cursor.execute(
-        "INSERT INTO course (track_id, title, description, topics) VALUES (?, ?, ?, ?)",
-        (course.track_id, course.title, course.description, course.topics)
+    "INSERT INTO course (course_id, track_id, title, description, topics) VALUES (?, ?, ?, ?, ?)",
+    (course.course_id, course.track_id, course.title, course.description, course.topics)
     )
     conn.commit()
 
@@ -197,6 +200,7 @@ def create_course(course: CourseCreate):
     return dict(new_course)
 
 class CourseUpdate(BaseModel):
+    course_id: int
     track_id: int
     title: str
     description: str
